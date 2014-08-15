@@ -1,10 +1,5 @@
-[![Build Status](https://travis-ci.org/codegangsta/cli.png?branch=master)](https://travis-ci.org/codegangsta/cli)
-
 # cli.go
-cli.go is simple, fast, and fun package for building command line apps in Go. The goal is to enable developers to write fast and distributable command line applications in an expressive way.
-
-You can view the API docs here:
-http://godoc.org/github.com/codegangsta/cli
+cli.go is a simple, fast, and fun package for building command line apps in Go. The goal is to enable developers to write fast and distributable command line applications in an expressive way.
 
 ## Overview
 Command line apps are usually so tiny that there is absolutely no reason why your code should *not* be self-documenting. Things like generating help text and parsing command flags/options should not hinder productivity when writing a command line app.
@@ -16,10 +11,10 @@ Make sure you have a working Go environment (go 1.1 is *required*). [See the ins
 
 To install cli.go, simply run:
 ```
-$ go get github.com/codegangsta/cli
+$ go get github.com/davelaursen/cli
 ```
 
-Make sure your PATH includes to the `$GOPATH/bin` directory so your commands can be easily used:
+Make sure your PATH includes the `$GOPATH/bin` directory so your commands can be easily used:
 ```
 export PATH=$PATH:$GOPATH/bin
 ```
@@ -32,7 +27,7 @@ package main
 
 import (
   "os"
-  "github.com/codegangsta/cli"
+  "github.com/davelaursen/cli"
 )
 
 func main() {
@@ -47,13 +42,14 @@ package main
 
 import (
   "os"
-  "github.com/codegangsta/cli"
+  "github.com/davelaursen/cli"
 )
 
 func main() {
   app := cli.NewApp()
   app.Name = "boom"
-  app.Usage = "make an explosive entrance"
+  app.Summary = "make an explosive entrance"
+  app.Usage = "boom [help]"
   app.Action = func(c *cli.Context) {
     println("boom! I say!")
   }
@@ -62,7 +58,7 @@ func main() {
 }
 ```
 
-Running this already gives you a ton of functionality, plus support for things like subcommands and flags, which are covered below.
+Running this already gives you a ton of functionality, plus support for things like flags, which are covered below.
 
 ## Example
 
@@ -74,13 +70,14 @@ package main
 
 import (
   "os"
-  "github.com/codegangsta/cli"
+  "github.com/davelaursen/cli"
 )
 
 func main() {
   app := cli.NewApp()
   app.Name = "greet"
-  app.Usage = "fight the loneliness!"
+  app.Summary = "fight the loneliness!" 
+  app.Usage = "greet [help]"
   app.Action = func(c *cli.Context) {
     println("Hello friend!")
   }
@@ -105,20 +102,16 @@ Hello friend!
 cli.go also generates some bitchass help text:
 ```
 $ greet help
-NAME:
-    greet - fight the loneliness!
+greet, v0.0.0 - A new application
 
 USAGE:
-    greet [global options] command [command options] [arguments...]
-
-VERSION:
-    0.0.0
+   greet [help]
 
 COMMANDS:
-    help, h  Shows a list of commands or help for one command
+   help       Shows a list of commands or help for one command
 
-GLOBAL OPTIONS
-    --version	Shows version information
+OPTIONS:
+   --version  print the version
 ```
 
 ### Arguments
@@ -188,100 +181,5 @@ app.Flags = []cli.Flag {
 
 That flag can then be set with `--lang spanish` or `-l spanish`. Note that giving two different forms of the same flag in the same command invocation is an error.
 
-### Subcommands
-
-Subcommands can be defined for a more git-like command line app.
-```go
-...
-app.Commands = []cli.Command{
-  {
-    Name:      "add",
-    ShortName: "a",
-    Usage:     "add a task to the list",
-    Action: func(c *cli.Context) {
-      println("added task: ", c.Args().First())
-    },
-  },
-  {
-    Name:      "complete",
-    ShortName: "c",
-    Usage:     "complete a task on the list",
-    Action: func(c *cli.Context) {
-      println("completed task: ", c.Args().First())
-    },
-  },
-  {
-    Name:      "template",
-    ShortName: "r",
-    Usage:     "options for task templates",
-    Subcommands: []cli.Command{
-      {
-        Name:  "add",
-        Usage: "add a new template",
-        Action: func(c *cli.Context) {
-            println("new task template: ", c.Args().First())
-        },
-      },
-      {
-        Name:  "remove",
-        Usage: "remove an existing template",
-        Action: func(c *cli.Context) {
-          println("removed task template: ", c.Args().First())
-        },
-      },
-    },
-  },     
-}
-...
-```
-
-### Bash Completion
-
-You can enable completion commands by setting the EnableBashCompletion
-flag on the App object.  By default, this setting will only auto-complete to
-show an app's subcommands, but you can write your own completion methods for
-the App or its subcommands.
-```go
-...
-var tasks = []string{"cook", "clean", "laundry", "eat", "sleep", "code"}
-app := cli.NewApp()
-app.EnableBashCompletion = true
-app.Commands = []cli.Command{
-  {
-    Name: "complete",
-    ShortName: "c",
-    Usage: "complete a task on the list",
-    Action: func(c *cli.Context) {
-       println("completed task: ", c.Args().First())
-    },
-    BashComplete: func(c *cli.Context) {
-      // This will complete if no args are passed
-      if len(c.Args()) > 0 {
-        return
-      }
-      for _, t := range tasks {
-        println(t)
-      }
-    },
-  }
-}
-...
-```
-
-#### To Enable
-
-Source the autocomplete/bash_autocomplete file in your .bashrc file while
-setting the PROG variable to the name of your program:
-
-`PROG=myprogram source /.../cli/autocomplete/bash_autocomplete`
-
-
-## Contribution Guidelines
-Feel free to put up a pull request to fix a bug or maybe add a feature. I will give it a code review and make sure that it does not break backwards compatibility. If I or any other collaborators agree that it is in line with the vision of the project, we will work with you to get the code into a mergeable state and merge it into the master branch.
-
-If you are have contributed something significant to the project, I will most likely add you as a collaborator. As a collaborator you are given the ability to merge others pull requests. It is very important that new code does not break existing code, so be careful about what code you do choose to merge. If you have any questions feel free to link @codegangsta to the issue in question and we can review it together.
-
-If you feel like you have contributed to the project but have not yet been added as a collaborator, I probably forgot to add you. Hit @codegangsta up over email and we will get it figured out.
-
 ## About
-cli.go is written by none other than the [Code Gangsta](http://codegangsta.io)
+cli was written by the [Code Gangsta](http://codagangsta.io), and was forked and modified by Dave Laursen

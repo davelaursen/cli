@@ -1,49 +1,26 @@
-package cli_test
+package cli
 
 import (
 	"flag"
 	"testing"
-
-	"github.com/codegangsta/cli"
 )
 
-func TestCommandDoNotIgnoreFlags(t *testing.T) {
-	app := cli.NewApp()
+func TestCommand(t *testing.T) {
+	app := NewApp()
 	set := flag.NewFlagSet("test", 0)
 	test := []string{"blah", "blah", "-break"}
 	set.Parse(test)
 
-	c := cli.NewContext(app, set, set)
+	c := NewContext(app, set, set)
 
-	command := cli.Command{
+	command := Command{
 		Name:        "test-cmd",
-		ShortName:   "tc",
-		Usage:       "this is for testing",
+		Summary:     "this is for testing",
+		Usage:       "test",
 		Description: "testing",
-		Action:      func(_ *cli.Context) {},
+		Action:      func(_ *Context) {},
 	}
 	err := command.Run(c)
 
 	expect(t, err.Error(), "flag provided but not defined: -break")
-}
-
-func TestCommandIgnoreFlags(t *testing.T) {
-	app := cli.NewApp()
-	set := flag.NewFlagSet("test", 0)
-	test := []string{"blah", "blah"}
-	set.Parse(test)
-
-	c := cli.NewContext(app, set, set)
-
-	command := cli.Command{
-		Name:            "test-cmd",
-		ShortName:       "tc",
-		Usage:           "this is for testing",
-		Description:     "testing",
-		Action:          func(_ *cli.Context) {},
-		SkipFlagParsing: true,
-	}
-	err := command.Run(c)
-
-	expect(t, err, nil)
 }
