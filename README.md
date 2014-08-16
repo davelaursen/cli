@@ -102,7 +102,7 @@ Hello friend!
 cli.go also generates some bitchass help text:
 ```
 $ greet help
-greet, v0.0.0 - A new application
+greet, v0.0.0 - fight the loneliness!
 
 USAGE:
    greet [help]
@@ -181,5 +181,3 @@ app.Flags = []cli.Flag {
 
 That flag can then be set with `--lang spanish` or `-l spanish`. Note that giving two different forms of the same flag in the same command invocation is an error.
 
-## About
-cli was written by the [Code Gangsta](http://codagangsta.io), and was forked and modified by Dave Laursen

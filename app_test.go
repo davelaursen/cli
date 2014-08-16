@@ -44,6 +44,7 @@ func ExampleAppHelp() {
 		},
 	}
 	app.Run(os.Args)
+	// Output:
 	// greet, v0.0.0 - A new application
 	//
 	// USAGE:
