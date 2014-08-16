@@ -1,6 +1,8 @@
 # cli.go
 cli.go is a simple, fast, and fun package for building command line apps in Go. The goal is to enable developers to write fast and distributable command line applications in an expressive way.
 
+Note: This package provides a subset of the functionality provided by the original cli.go package created by Codegangsta. It simplies the API and provided a reformatted help output.
+
 ## Overview
 Command line apps are usually so tiny that there is absolutely no reason why your code should *not* be self-documenting. Things like generating help text and parsing command flags/options should not hinder productivity when writing a command line app.
 
