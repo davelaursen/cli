@@ -11,7 +11,7 @@ import (
 
 // This flag prints the version for the application
 var VersionFlag = BoolFlag{
-	Name:  "version",
+	Name:  "version, v",
 	Usage: "print the version",
 }
 
