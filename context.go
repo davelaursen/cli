@@ -20,92 +20,72 @@ type Context struct {
 	setFlags  map[string]bool
 }
 
-// NewContext creates a new context. For use in when invoking an App or Command action.
+// Creates a new context. For use in when invoking an App or Command action.
 func NewContext(app *App, set *flag.FlagSet, globalSet *flag.FlagSet) *Context {
 	return &Context{App: app, flagSet: set, globalSet: globalSet}
 }
 
-// Int looks up the value of a local int flag, returns 0 if no int flag exists
+// Looks up the value of a local int flag, returns 0 if no int flag exists
 func (c *Context) Int(name string) int {
 	return lookupInt(name, c.flagSet)
 }
 
-// Duration looks up the value of a local time.Duration flag, returns 0 if no time.Duration flag exists
+// Looks up the value of a local time.Duration flag, returns 0 if no time.Duration flag exists
 func (c *Context) Duration(name string) time.Duration {
 	return lookupDuration(name, c.flagSet)
 }
 
-// Float64 looks up the value of a local float64 flag, returns 0 if no float64 flag exists
+// Looks up the value of a local float64 flag, returns 0 if no float64 flag exists
 func (c *Context) Float64(name string) float64 {
 	return lookupFloat64(name, c.flagSet)
 }
 
-// Bool looks up the value of a local bool flag, returns false if no bool flag exists
+// Looks up the value of a local bool flag, returns false if no bool flag exists
 func (c *Context) Bool(name string) bool {
 	return lookupBool(name, c.flagSet)
 }
 
-// BoolT looks up the value of a local boolT flag, returns false if no bool flag exists
+// Looks up the value of a local boolT flag, returns false if no bool flag exists
 func (c *Context) BoolT(name string) bool {
 	return lookupBoolT(name, c.flagSet)
 }
 
-// String looks up the value of a local string flag, returns "" if no string flag exists
+// Looks up the value of a local string flag, returns "" if no string flag exists
 func (c *Context) String(name string) string {
 	return lookupString(name, c.flagSet)
 }
 
-// StringSlice looks up the value of a local string slice flag, returns nil if no string slice flag exists
-func (c *Context) StringSlice(name string) []string {
-	return lookupStringSlice(name, c.flagSet)
-}
-
-// IntSlice looks up the value of a local int slice flag, returns nil if no int slice flag exists
-func (c *Context) IntSlice(name string) []int {
-	return lookupIntSlice(name, c.flagSet)
-}
-
-// Generic looks up the value of a local generic flag, returns nil if no generic flag exists
+// Looks up the value of a local generic flag, returns nil if no generic flag exists
 func (c *Context) Generic(name string) interface{} {
 	return lookupGeneric(name, c.flagSet)
 }
 
-// GlobalInt looks up the value of a global int flag, returns 0 if no int flag exists
+// Looks up the value of a global int flag, returns 0 if no int flag exists
 func (c *Context) GlobalInt(name string) int {
 	return lookupInt(name, c.globalSet)
 }
 
-// GlobalDuration looks up the value of a global time.Duration flag, returns 0 if no time.Duration flag exists
+// Looks up the value of a global time.Duration flag, returns 0 if no time.Duration flag exists
 func (c *Context) GlobalDuration(name string) time.Duration {
 	return lookupDuration(name, c.globalSet)
 }
 
-// GlobalBool looks up the value of a global bool flag, returns false if no bool flag exists
+// Looks up the value of a global bool flag, returns false if no bool flag exists
 func (c *Context) GlobalBool(name string) bool {
 	return lookupBool(name, c.globalSet)
 }
 
-// GlobalString looks up the value of a global string flag, returns "" if no string flag exists
+// Looks up the value of a global string flag, returns "" if no string flag exists
 func (c *Context) GlobalString(name string) string {
 	return lookupString(name, c.globalSet)
 }
 
-// GlobalStringSlice looks up the value of a global string slice flag, returns nil if no string slice flag exists
-func (c *Context) GlobalStringSlice(name string) []string {
-	return lookupStringSlice(name, c.globalSet)
-}
-
-// GlobalIntSlice looks up the value of a global int slice flag, returns nil if no int slice flag exists
-func (c *Context) GlobalIntSlice(name string) []int {
-	return lookupIntSlice(name, c.globalSet)
-}
-
-// GlobalGeneric looks up the value of a global generic flag, returns nil if no generic flag exists
+// Looks up the value of a global generic flag, returns nil if no generic flag exists
 func (c *Context) GlobalGeneric(name string) interface{} {
 	return lookupGeneric(name, c.globalSet)
 }
 
-// IsSet determines if the flag was actually set exists
+// Determines if the flag was actually set exists
 func (c *Context) IsSet(name string) bool {
 	if c.setFlags == nil {
 		c.setFlags = make(map[string]bool)
@@ -116,7 +96,7 @@ func (c *Context) IsSet(name string) bool {
 	return c.setFlags[name] == true
 }
 
-// FlagNames returns a slice of flag names used in this context.
+// Returns a slice of flag names used in this context.
 func (c *Context) FlagNames() (names []string) {
 	for _, flag := range c.Command.Flags {
 		name := strings.Split(flag.getName(), ",")[0]
@@ -128,16 +108,15 @@ func (c *Context) FlagNames() (names []string) {
 	return
 }
 
-// Args represents a slice of command line arguments.
 type Args []string
 
-// Args returns the command line arguments associated with the context.
+// Returns the command line arguments associated with the context.
 func (c *Context) Args() Args {
 	args := Args(c.flagSet.Args())
 	return args
 }
 
-// Get returns the nth argument, or else a blank string
+// Returns the nth argument, or else a blank string
 func (a Args) Get(n int) string {
 	if len(a) > n {
 		return a[n]
@@ -145,12 +124,12 @@ func (a Args) Get(n int) string {
 	return ""
 }
 
-// First returns the first argument, or else a blank string
+// Returns the first argument, or else a blank string
 func (a Args) First() string {
 	return a.Get(0)
 }
 
-// Tail return the rest of the arguments (not the first one)
+// Return the rest of the arguments (not the first one)
 // or else an empty string slice
 func (a Args) Tail() []string {
 	if len(a) >= 2 {
@@ -159,12 +138,12 @@ func (a Args) Tail() []string {
 	return []string{}
 }
 
-// Present checks if there are any arguments present
+// Checks if there are any arguments present
 func (a Args) Present() bool {
 	return len(a) != 0
 }
 
-// Swap swaps arguments at the given indexes
+// Swaps arguments at the given indexes
 func (a Args) Swap(from, to int) error {
 	if from >= len(a) || to >= len(a) {
 		return errors.New("index out of range")
@@ -220,26 +199,6 @@ func lookupString(name string, set *flag.FlagSet) string {
 	return ""
 }
 
-func lookupStringSlice(name string, set *flag.FlagSet) []string {
-	f := set.Lookup(name)
-	if f != nil {
-		return (f.Value.(*StringSlice)).Value()
-
-	}
-
-	return nil
-}
-
-func lookupIntSlice(name string, set *flag.FlagSet) []int {
-	f := set.Lookup(name)
-	if f != nil {
-		return (f.Value.(*IntSlice)).Value()
-
-	}
-
-	return nil
-}
-
 func lookupGeneric(name string, set *flag.FlagSet) interface{} {
 	f := set.Lookup(name)
 	if f != nil {
@@ -275,11 +234,7 @@ func lookupBoolT(name string, set *flag.FlagSet) bool {
 }
 
 func copyFlag(name string, ff *flag.Flag, set *flag.FlagSet) {
-	switch ff.Value.(type) {
-	case *StringSlice:
-	default:
-		set.Set(name, ff.Value.String())
-	}
+	set.Set(name, ff.Value.String())
 }
 
 func normalizeFlags(flags []Flag, set *flag.FlagSet) error {

@@ -9,7 +9,7 @@
 //   func main() {
 //     app := cli.NewApp()
 //     app.Name = "greet"
-//     app.Summary = "say a greeting"
+//     app.Description = "say a greeting"
 //     app.Usage = "greet [help]"
 //     app.Action = func(c *cli.Context) {
 //       println("Greetings")

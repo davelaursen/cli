@@ -10,47 +10,81 @@ import (
 // The text template for the Default help topic.
 // cli.go uses text/template to render templates. You can
 // render custom help text by setting this variable.
-var AppHelpTemplate = `{{.Name}}, v{{.Version}} - {{.Summary}}
+var AppHelpTemplate = `
+{{.Name}}, v{{.Version}}
+{{.Description}}
 
 USAGE:
    {{.Usage}}
 
 COMMANDS:
-{{range .Commands}}{{ "   " }}{{.Name}}{{ "\t" }}{{.Summary}}{{ "\n" }}{{end}}{{ if .Flags }}
+{{range .Commands}}{{ "   " }}{{.Name}}{{ "\t" }}{{.ShortDescription}}{{ "\n" }}{{end}}
+   Use '{{.Exec}} help <command> [<subcommand>]' for more
+   information about a command or subcommand.
+{{ if .Flags }}
 OPTIONS:
-   {{range .Flags}}{{.}}
-   {{end}}{{ end }}
+{{range .Flags}}{{ "   " }}{{.}}{{ "\n" }}{{end}}{{ end }}
 `
 
 // The text template for the command help topic.
 // cli.go uses text/template to render templates. You can
 // render custom help text by setting this variable.
-var CommandHelpTemplate = `{{.Name}} - {{.Summary}}
+var CommandHelpTemplate = `
+{{.Name}} - {{.ShortDescription}}
 
 USAGE:
-   {{.Usage}}
+   {{.Usage}}{{if .Description}}
 
 DESCRIPTION:
-   {{.Description}}{{ if .Flags }}
+   {{.Description}}{{end}}{{if .Subcommands}}
 
-OPTIONS:
-   {{range .Flags}}{{.}}
-   {{end}}{{ end }}
+SUBCOMMANDS:
+   {{range .Subcommands}}{{.Name}}{{ "\t" }}{{.ShortDescription}}
+   {{end}}{{end}}
+`
+
+// The text template for the subcommand help topic.
+// cli.go uses text/template to render templates. You can
+// render custom help text by setting this variable.
+var SubcommandHelpTemplate = `
+{{.Name}} - {{.ShortDescription}}
+
+USAGE:
+   {{.Usage}}{{if .Description}}
+
+DESCRIPTION:
+   {{.Description}}{{end}}
 `
 
 var helpCommand = Command{
-	Name:    "help",
-	Summary: "Shows a list of commands or help for one command",
-	Usage:   "help [command]",
+	Name:             "help",
+	ShortDescription: "Shows a list of commands or help for one command",
 	Action: func(c *Context) {
 		args := c.Args()
 		if args.Present() {
-			ShowCommandHelp(c, args.First())
+			if len(args) == 2 {
+				ShowSubcommandHelp(c, args[0], args[1])
+			} else {
+				ShowCommandHelp(c, args.First())
+			}
 		} else {
 			ShowAppHelp(c)
 		}
 	},
 }
+
+// var helpSubcommand = Command{
+// 	Name:             "help",
+// 	ShortDescription: "Shows a list of commands or help for one command",
+// 	Action: func(c *Context) {
+// 		args := c.Args()
+// 		if args.Present() {
+// 			ShowCommandHelp(c, args.First())
+// 		} else {
+// 			ShowSubcommandHelp(c)
+// 		}
+// 	},
+// }
 
 // Prints help for the App
 var HelpPrinter = printHelp
@@ -60,6 +94,13 @@ var VersionPrinter = printVersion
 
 func ShowAppHelp(c *Context) {
 	HelpPrinter(AppHelpTemplate, c.App)
+}
+
+// Prints the list of subcommands as the default app completion method
+func DefaultAppComplete(c *Context) {
+	for _, command := range c.App.Commands {
+		fmt.Println(command.Name)
+	}
 }
 
 // Prints help for the given command
@@ -73,6 +114,31 @@ func ShowCommandHelp(c *Context, command string) {
 
 	if c.App.CommandNotFound != nil {
 		c.App.CommandNotFound(c, command)
+	} else {
+		fmt.Printf("No help topic for '%v'\n", command)
+	}
+}
+
+// // Prints help for the given subcommand
+// func ShowSubcommandHelp(c *Context) {
+// 	HelpPrinter(SubcommandHelpTemplate, c.App)
+// }
+
+// Prints help for the given subcommand
+func ShowSubcommandHelp(ctx *Context, command, subcommand string) {
+	for _, c := range ctx.App.Commands {
+		if c.HasName(command) {
+			for _, s := range c.Subcommands {
+				if s.HasName(subcommand) {
+					HelpPrinter(SubcommandHelpTemplate, s)
+					return
+				}
+			}
+		}
+	}
+
+	if ctx.App.CommandNotFound != nil {
+		ctx.App.CommandNotFound(ctx, command)
 	} else {
 		fmt.Printf("No help topic for '%v'\n", command)
 	}
@@ -100,24 +166,6 @@ func printHelp(templ string, data interface{}) {
 func checkVersion(c *Context) bool {
 	if c.GlobalBool("version") {
 		ShowVersion(c)
-		return true
-	}
-
-	return false
-}
-
-func checkHelp(c *Context) bool {
-	if c.GlobalBool("h") || c.GlobalBool("help") {
-		ShowAppHelp(c)
-		return true
-	}
-
-	return false
-}
-
-func checkCommandHelp(c *Context, name string) bool {
-	if c.Bool("h") || c.Bool("help") {
-		ShowCommandHelp(c, name)
 		return true
 	}
 
