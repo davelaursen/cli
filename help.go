@@ -73,19 +73,6 @@ var helpCommand = Command{
 	},
 }
 
-// var helpSubcommand = Command{
-// 	Name:             "help",
-// 	ShortDescription: "Shows a list of commands or help for one command",
-// 	Action: func(c *Context) {
-// 		args := c.Args()
-// 		if args.Present() {
-// 			ShowCommandHelp(c, args.First())
-// 		} else {
-// 			ShowSubcommandHelp(c)
-// 		}
-// 	},
-// }
-
 // Prints help for the App
 var HelpPrinter = printHelp
 
@@ -118,11 +105,6 @@ func ShowCommandHelp(c *Context, command string) {
 		fmt.Printf("No help topic for '%v'\n", command)
 	}
 }
-
-// // Prints help for the given subcommand
-// func ShowSubcommandHelp(c *Context) {
-// 	HelpPrinter(SubcommandHelpTemplate, c.App)
-// }
 
 // Prints help for the given subcommand
 func ShowSubcommandHelp(ctx *Context, command, subcommand string) {
